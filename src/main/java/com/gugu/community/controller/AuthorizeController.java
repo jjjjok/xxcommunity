@@ -5,6 +5,7 @@ import com.gugu.community.dto.AccessTokenDTO;
 import com.gugu.community.dto.GithubUser;
 import com.gugu.community.mapper.UserMapper;
 import com.gugu.community.model.User;
+import com.gugu.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -33,6 +34,9 @@ public class AuthorizeController {
     @Value("${github.redirect.uri}")
     private String redirectUri;
 
+    @Autowired
+    private UserService userService;
+
     @GetMapping("/callback")
     public String callBack(@RequestParam(name = "code") String code,
                            @RequestParam(name = "state") String state,
@@ -55,11 +59,9 @@ public class AuthorizeController {
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl(githubUser.getAvatar_url());
-            userMapper.insert(user);
+            userService.createOrUpdate(user);
             Cookie cookie = new Cookie("token", token);
             response.addCookie(cookie);
-
-
             return "redirect:/";
         }else {
             return "redirect:/";
