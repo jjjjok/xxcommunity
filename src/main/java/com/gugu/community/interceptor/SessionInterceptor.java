@@ -3,6 +3,7 @@ package com.gugu.community.interceptor;
 import com.gugu.community.mapper.UserMapper;
 import com.gugu.community.model.User;
 import com.gugu.community.model.UserExample;
+import com.gugu.community.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class SessionInterceptor implements HandlerInterceptor {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         Cookie[] cookies = request.getCookies();
@@ -32,6 +36,8 @@ public class SessionInterceptor implements HandlerInterceptor {
                     List<User> user = userMapper.selectByExample(userExample);
                     if (user.size() != 0) {
                         request.getSession().setAttribute("user", user.get(0));
+                        Long unreadCount = notificationService.unreadCount(user.get(0).getId());
+                        request.getSession().setAttribute("unreadCount", unreadCount);
                     }
                     break;
                 }

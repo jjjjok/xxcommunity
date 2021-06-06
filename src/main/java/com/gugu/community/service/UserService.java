@@ -15,7 +15,8 @@ public class UserService {
 
     public void createOrUpdate(User user) {
         UserExample userExample = new UserExample();
-        userExample.createCriteria().andAccountIdEqualTo(user.getAccountId());
+        userExample.createCriteria()
+                .andAccountIdEqualTo(user.getAccountId());
         List<User> users = userMapper.selectByExample(userExample);
         if (users.size() == 0) {
             // 插入
@@ -30,9 +31,10 @@ public class UserService {
             updateUser.setAvatarUrl(user.getAvatarUrl());
             updateUser.setName(user.getName());
             updateUser.setToken(user.getToken());
-            UserExample userExample1 = new UserExample();
-            userExample.createCriteria().andIdEqualTo(dbUser.getId());
-            userMapper.updateByExampleSelective(updateUser,userExample1);
+            UserExample example = new UserExample();
+            example.createCriteria()
+                    .andIdEqualTo(dbUser.getId());
+            userMapper.updateByExampleSelective(updateUser, example);
         }
     }
 }
